@@ -7,11 +7,15 @@
 
 ------
 
-2 - create 3-node kubernetes cluster via Ansible 
+2 - create 3-node kubernetes cluster via Ansible
+
+[kubernetes/README.md](kubernetes/README.md)
 
 ------
 
 3 - implement monitoring for cluster via Prometheus
+
+[observability/README.md](observability/README.md)
 
 ------
 
@@ -35,4 +39,3 @@
 2 - save outputs in postgres and use it as cache
 
 3 - deploy api on kubernetes cluster
-
