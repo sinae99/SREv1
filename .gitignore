@@ -8,8 +8,6 @@
 **/*_override.tf
 **/.providers/
 
-# Local secrets
-**/terraform.tfvars
 
 # Agent notes (local)
 AGENTS.md
