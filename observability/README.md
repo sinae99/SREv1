@@ -11,7 +11,7 @@ Release: `cluster-monitoring`
 | Prometheus Operator | CRDs + reconciles Prometheus / Alertmanager |
 | Prometheus | Scrape + store + PromQL |
 | Grafana | Dashboards |
-| Alertmanager | Alert routing 
+| Alertmanager | Alert routing |
 
 
 ---
@@ -41,12 +41,12 @@ cd observability
 
 helm install cluster-monitoring prometheus-community/kube-prometheus-stack \
   -n monitoring \
-  -f values.yaml \
+  -f values.yaml
 ```
 
 ---
 
-## 4. Verify
+## 4. verify
 
 ```bash
 kubectl get pods -n monitoring
@@ -57,7 +57,7 @@ Expect Running: prometheus-operator, prometheus, grafana, alertmanager.
 
 ---
 
-## 6. Access (port-forwards + credentials)
+## 5. access (port-forwards + credentials)
 
 ```bash
 ./start-port-forwards.sh
@@ -66,9 +66,9 @@ Expect Running: prometheus-operator, prometheus, grafana, alertmanager.
 
 | UI | URL |
 |----|-----|
-| Prometheus | localhost:9090 |
-| Grafana | localhost:3000 |
-| Alertmanager | localhost:9093 |
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3000 |
+| Alertmanager | http://localhost:9093 |
 
 Stop:
 
@@ -82,7 +82,8 @@ Stop:
 
 | File | Purpose |
 |------|---------|
-| `values.yaml` | Helm values (prom + grafana + alertmanager only) |
+| `values.yaml` | Helm values |
+| `dashboards/nodes-overview.json` | Grafana: nodes status / CPU / RAM / pods |
 | `credentials.sh` | Print Grafana admin user/password |
 | `start-port-forwards.sh` | Port-forward Prometheus / Grafana / Alertmanager |
 | `stop-port-forwards.sh` | Stop those port-forwards |
