@@ -66,9 +66,9 @@ Expect Running: prometheus-operator, prometheus, grafana, alertmanager.
 
 | UI | URL |
 |----|-----|
-| Prometheus | http://localhost:9090 |
-| Grafana | http://localhost:3000 |
-| Alertmanager | http://localhost:9093 |
+| Prometheus | localhost:9090 |
+| Grafana | localhost:3000 |
+| Alertmanager | localhost:9093 |
 
 Stop:
 
