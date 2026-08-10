@@ -58,7 +58,9 @@ terraform output nodes
 ./ssh.sh vm3
 ```
 
-## 8. install Docker (as a habbit)
+## 8. install Docker 
+
+its only my habit
 
 Install Docker on all VMs via :
 
@@ -92,11 +94,4 @@ Verify:
 ```bash
 cd ..
 ./ssh.sh vm1 -- sudo crictl images
-```
-
-Then run Kubespray from the laptop:
-
-```bash
-cd ../kubernetes
-./kubespray.sh
 ```
