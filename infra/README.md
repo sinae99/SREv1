@@ -1,4 +1,4 @@
-# infra
+# infrastructure : terraform + Arvan iaas
 
 ## 1. Conf
 
@@ -27,7 +27,6 @@ Wait until `vm1`, `vm2`, `vm3` are `ACTIVE`.
 terraform output nodes
 ```
 
-Note each `private` IP.
 
 ## 5. Public IPs ---> Arvan panel
 
