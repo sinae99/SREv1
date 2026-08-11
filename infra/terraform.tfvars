@@ -1,4 +1,4 @@
-api_key = "apikey dbc424ba-b700-518d-b25e-07a5ff316176"
+api_key = "x"
 
 region         = "ir-thr-ba1"
 distro_name    = "ubuntu"
