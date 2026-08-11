@@ -21,13 +21,19 @@
 
 4 - create dashboard in Grafana
 
+[observability/dashboards](observability/dashboards)
+
 ------
 
 5 - set up Alerting
 
+[observability/alerts](observability/alerts)
+
 ------
 
-6 - deploy postgres
+6 - deploy postgres cluster
+
+[database/README.md](database/README.md)
 
 ------
 
@@ -39,3 +45,9 @@
 2 - save outputs in postgres and use it as cache
 
 3 - deploy api on kubernetes cluster
+
+[api/README.md](api/README.md) — Flask app + Dockerfile + `api/k8s/` manifests
+
+4 - CI/CD (GitHub Actions → GHCR → cluster)
+
+[cicd/README.md](cicd/README.md)
