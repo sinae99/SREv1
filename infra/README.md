@@ -50,7 +50,7 @@ terraform apply
 terraform output nodes
 ```
 
-## 7. SSH
+## 7. ssh
 
 ```bash
 ./ssh.sh vm1
@@ -60,9 +60,9 @@ terraform output nodes
 
 ## 8. install Docker 
 
-its only my habit
+as a habit
 
-Install Docker on all VMs via :
+via :
 
 https://github.com/sinae99/Docker-install-playbook
 
