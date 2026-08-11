@@ -78,6 +78,7 @@ jobs:
         run: |
           kubectl apply -f api/k8s/namespace.yaml
           kubectl apply -f api/k8s/secret.yaml
+          kubectl apply -f api/k8s/secret-ghcr.yaml
           kubectl apply -f api/k8s/deployment.yaml
           kubectl apply -f api/k8s/service.yaml
           kubectl apply -f api/k8s/servicemonitor.yaml

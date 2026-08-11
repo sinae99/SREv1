@@ -19,7 +19,7 @@ Workflow file: [`.github/workflows/geoapi.yml`](../.github/workflows/geoapi.yml)
 |------|------|
 | 1. test | `pytest` in `api/` |
 | 2. build-push | `docker build` → `ghcr.io/sinae99/geoapi:<sha>` + `:latest` |
-| 3. deploy | kubeconfig from secret → apply `api/k8s/` (incl. `secret.yaml`) → set image to `<sha>` |
+| 3. deploy | kubeconfig → apply `api/k8s/` (DB + GHCR secrets, Deployment with `imagePullSecrets`) → set image to `<sha>` |
 
 Triggers:
 
@@ -47,9 +47,16 @@ GitHub-hosted runners must reach the API server (`vm1` public IP `:6443`).
 
 ---
 
-## GHCR package visibility
+## Private GHCR pull
 
-After the first successful push, set the `geoapi` package to **Public** (GitHub → Packages), so cluster nodes can pull without an `imagePullSecret`.
+The `geoapi` package stays **private**. Cluster nodes pull with Secret `ghcr-cred` ([`api/k8s/secret-ghcr.yaml`](../api/k8s/secret-ghcr.yaml)).
+
+Deployment ([`api/k8s/deployment.yaml`](../api/k8s/deployment.yaml)):
+
+- `imagePullSecrets: [ghcr-cred]`
+- `imagePullPolicy: Always` — re-pull on every new Pod (CI updates image tag to commit sha)
+
+No need to make the GHCR package public.
 
 ---
 
@@ -58,6 +65,7 @@ After the first successful push, set the `geoapi` package to **Public** (GitHub 
 ```bash
 kubectl apply -f api/k8s/namespace.yaml
 kubectl apply -f api/k8s/secret.yaml
+kubectl apply -f api/k8s/secret-ghcr.yaml
 kubectl apply -f api/k8s/deployment.yaml
 kubectl apply -f api/k8s/service.yaml
 kubectl apply -f api/k8s/servicemonitor.yaml

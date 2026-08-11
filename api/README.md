@@ -26,33 +26,28 @@ echo "$GITHUB_TOKEN" | docker login ghcr.io -u sinae99 --password-stdin
 docker push ghcr.io/sinae99/geoapi:latest
 ```
 
-If the GHCR package is **private** :
-
-```bash
-kubectl -n geoapi create secret docker-registry ghcr-cred \
-  --docker-server=ghcr.io \
-  --docker-username=sinae99 \
-  --docker-password="$GITHUB_TOKEN"
-```
-
-Then under `spec.template.spec` in the Deployment:
-
-```yaml
-imagePullSecrets:
-  - name: ghcr-cred
-```
+Use a **PAT** (`write:packages` / `read:packages`). CI uses `GITHUB_TOKEN` automatically.
 
 ### 2. Apply manifests
 
 ```bash
 kubectl apply -f api/k8s/namespace.yaml
 kubectl apply -f api/k8s/secret.yaml
+kubectl apply -f api/k8s/secret-ghcr.yaml
 kubectl apply -f api/k8s/deployment.yaml
 kubectl apply -f api/k8s/service.yaml
 kubectl apply -f api/k8s/servicemonitor.yaml
 ```
 
-Secret `geoapi-db` (`DATABASE_URL` → `sina-db-rw.postgres.svc.cluster.local:5432/geoapi`) comes from [`k8s/secret.yaml`](k8s/secret.yaml).
+| Manifest | Role |
+|----------|------|
+| [`k8s/secret.yaml`](k8s/secret.yaml) | `geoapi-db` → `DATABASE_URL` (Postgres) |
+| [`k8s/secret-ghcr.yaml`](k8s/secret-ghcr.yaml) | `ghcr-cred` → pull private image from GHCR |
+
+Deployment uses:
+
+- `imagePullSecrets: [{ name: ghcr-cred }]` — auth for private `ghcr.io/sinae99/geoapi`
+- `imagePullPolicy: Always` — always re-pull (needed when tagging `:latest` or after each CI sha)
 
 ### 3. Verify
 
@@ -84,10 +79,11 @@ curl "http://127.0.0.1:8080/metrics"
 | `test_app.py` | Unit tests |
 | `metrics/README.md` | Metrics + Grafana notes |
 | `k8s/namespace.yaml` | Namespace `geoapi` |
-| `k8s/deployment.yaml` | 1 replica, env from Secret |
+| `k8s/deployment.yaml` | 1 replica; `imagePullSecrets: ghcr-cred`; `imagePullPolicy: Always` |
 | `k8s/service.yaml` | ClusterIP `:80` → pod `:8000` |
 | `k8s/servicemonitor.yaml` | Prometheus scrape |
 | `k8s/secret.yaml` | Secret `geoapi-db` (`DATABASE_URL`) |
+| `k8s/secret-ghcr.yaml` | Secret `ghcr-cred` (pull from private GHCR) |
 
 ---
 
