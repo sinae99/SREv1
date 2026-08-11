@@ -1,4 +1,4 @@
-# cicd : GitHub Actions → GHCR → cluster
+# cicd : GitHub Actions + GHCR
 
 ```
 git push → pytest → docker build → ghcr.io/sinae99/geoapi → kubectl apply
@@ -14,7 +14,6 @@ Workflow: [`.github/workflows/geoapi.yml`](../.github/workflows/geoapi.yml)
 | build-push | `ghcr.io/sinae99/geoapi:<sha>` + `:latest` |
 | deploy | apply `api/k8s/` → set image to `<sha>` |
 
-Triggers: `push` to `main` (`api/**`, workflow file) or `workflow_dispatch`.
 
 ## Secrets
 
