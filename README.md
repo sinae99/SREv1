@@ -1,5 +1,5 @@
 
-## planning
+## phases
 
 1 - create VMs via Terraform
 
@@ -40,14 +40,16 @@
 
 ### scenario - 1
 
-1 - create a web api that get ip as input and return ip geolocation
+7 - api
 
-2 - save outputs in postgres and use it as cache
+- create a web api that get ip as input and return ip geolocation
 
-3 - deploy api on kubernetes cluster
+- save outputs in postgres and use it as cache
 
-[api/README.md](api/README.md) — Flask app + Dockerfile + `api/k8s/` manifests
+- deploy api on kubernetes cluster
 
-4 - CI/CD (GitHub Actions → GHCR → cluster)
+[api/README.md](api/README.md)
+
+8 - CI/CD
 
 [cicd/README.md](cicd/README.md)
