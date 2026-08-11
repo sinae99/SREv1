@@ -27,7 +27,7 @@
 
 5 - set up Alerting
 
-[observability/alerts](observability/alerts)
+observability/alerts
 
 ------
 
