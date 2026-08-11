@@ -2,7 +2,7 @@
 
 ## 1. conf
 
-Edit `terraform.tfvars`:
+`terraform.tfvars`:
 
 - set `api_key`
 
@@ -74,7 +74,7 @@ ansible-playbook install-docker.yml
 ```
 
 
-## 9. preload Kubespray images into containerd (for stupid 403 issues)
+## 9. preload Kubespray images into containerd (for 403 issues)
 
 pull images then push/load thm into containerd on the 3 VMs with:
 
