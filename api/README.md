@@ -6,15 +6,10 @@ Stack: Flask + psycopg + prometheus-client.
 
 | Path | Description |
 |------|-------------|
-| `GET /iploc?ip=8.8.8.8` | Lookup (Postgres cache, then ip-api.com) |
+| `GET /iploc?ip=8.8.8.8` | Lookup ( Postgres + cache ----> ip-api.com ) |
 | `GET /health` | `{"status":"ok"}` |
 | `GET /metrics` | see [`metrics/README.md`](metrics/README.md) |
 
-## Config
-
-| Env | Source |
-|-----|--------|
-| `DATABASE_URL` | Secret `geoapi-db` ([`k8s/secret.yaml`](k8s/secret.yaml)) |
 
 ## Layout
 
@@ -26,9 +21,6 @@ Stack: Flask + psycopg + prometheus-client.
 | `k8s/` | Namespace, secrets, Deployment, Service, ServiceMonitor |
 | `metrics/` | Prometheus / Grafana notes |
 
-## CI + Deploy 
-
-→ [`../cicd/README.md`](../cicd/README.md)
 
 ## Tests
 
