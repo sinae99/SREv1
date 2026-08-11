@@ -4,15 +4,6 @@ Chart: `prometheus-community/kube-prometheus-stack`
 Namespace: `monitoring`  
 Release: `cluster-monitoring`
 
-`values.yaml`:
-
-| Component | Role |
-|-----------|------|
-| Prometheus Operator | CRDs + reconciles Prometheus / Alertmanager |
-| Prometheus | Scrape + store + PromQL |
-| Grafana | Dashboards |
-| Alertmanager | Alert routing |
-
 
 ---
 
