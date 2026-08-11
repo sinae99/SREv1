@@ -1,4 +1,4 @@
-# database : CloudNativePG (primary + replica)
+# database : CNPG (primary + replica)
 
 Operator: **CloudNativePG 1.30.0**  
 Operator namespace: `cnpg-system`  
@@ -15,12 +15,6 @@ StorageClass: `local-path`
 | `sina-db-rw` | Service → primary |
 | `sina-db-ro` | Service → replicas |
 
-
-pre-req:
-
-```bash
-kubectl get deploy -n cnpg-system cnpg-controller-manager
-```
 
 ---
 
