@@ -1,8 +1,8 @@
 # api metrics
 
-App exposes Prometheus metrics at `GET /metrics`.
+path: `GET /metrics`
 
-A ServiceMonitor tells Prometheus Operator to scrape the geoapi Service.
+scrape the geoapi service :
 
 ```bash
 kubectl apply -f api/k8s/servicemonitor.yaml
@@ -10,11 +10,11 @@ kubectl apply -f api/k8s/servicemonitor.yaml
 
 ---
 
-## Metric catalog
+## Metric
 
 | Metric | Type | Meaning |
 |--------|------|---------|
-| `iploc_requests_total` | Counter | Total `/iploc` calls (including bad/missing IP) |
+| `iploc_requests_total` | Counter | Total `/iploc` calls |
 | `iploc_cached_ips` | Gauge | Rows in `ip_cache` (`SELECT COUNT(*)`) |
 
 ---
