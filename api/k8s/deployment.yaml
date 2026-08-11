@@ -16,7 +16,11 @@ spec:
         app: geoapi
     spec:
       imagePullSecrets:
-       - name: ghcr-cred
+        - name: ghcr-cred
+      hostAliases:
+        - ip: "208.95.112.1"
+          hostnames:
+            - "ip-api.com"
       containers:
         - name: geoapi
           image: ghcr.io/sinae99/geoapi:latest
