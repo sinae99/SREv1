@@ -19,7 +19,7 @@ Workflow file: [`.github/workflows/geoapi.yml`](../.github/workflows/geoapi.yml)
 |------|------|
 | 1. test | `pytest` in `api/` |
 | 2. build-push | `docker build` → `ghcr.io/sinae99/geoapi:<sha>` + `:latest` |
-| 3. deploy | kubeconfig from secret → DB secret → apply `api/k8s/` → set image to `<sha>` |
+| 3. deploy | kubeconfig from secret → apply `api/k8s/` (incl. `secret.yaml`) → set image to `<sha>` |
 
 Triggers:
 
@@ -56,16 +56,13 @@ After the first successful push, set the `geoapi` package to **Public** (GitHub 
 ## What deploy applies
 
 ```bash
-bash api/k8s/create-secret.sh
 kubectl apply -f api/k8s/namespace.yaml
+kubectl apply -f api/k8s/secret.yaml
 kubectl apply -f api/k8s/deployment.yaml
 kubectl apply -f api/k8s/service.yaml
 kubectl apply -f api/k8s/servicemonitor.yaml
 kubectl -n geoapi set image deploy/geoapi geoapi=ghcr.io/sinae99/geoapi:<sha>
 ```
-
-Postgres (`sina-db`) must already exist so `create-secret.sh` can read `sina-db-app`.
-
 ---
 
 ## Files

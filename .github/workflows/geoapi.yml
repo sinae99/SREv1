@@ -74,12 +74,10 @@ jobs:
           printf '%s\n' "$KUBECONFIG_CONTENT" > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      - name: Ensure geoapi DB secret
-        run: bash api/k8s/create-secret.sh
-
       - name: Apply manifests
         run: |
           kubectl apply -f api/k8s/namespace.yaml
+          kubectl apply -f api/k8s/secret.yaml
           kubectl apply -f api/k8s/deployment.yaml
           kubectl apply -f api/k8s/service.yaml
           kubectl apply -f api/k8s/servicemonitor.yaml
