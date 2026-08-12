@@ -26,13 +26,7 @@
 
 ------
 
-5 - set up Alerting
-
-observability/alerts
-
-------
-
-6 - deploy postgres cluster
+5 - deploy postgres cluster
 
 [database/README.md](database/README.md)
 
@@ -41,7 +35,7 @@ observability/alerts
 
 ### scenario - 1
 
-7 - api
+6 - api
 
 - create a web api that get ip as input and return ip geolocation
 
@@ -51,7 +45,7 @@ observability/alerts
 
 [api/README.md](api/README.md)
 
-8 - CI/CD
+7 - CI/CD
 
 [cicd/README.md](cicd/README.md)
 
