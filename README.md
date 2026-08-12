@@ -1,4 +1,5 @@
 ## Arvan Cloud SRE Challenge
+
 ### phases
 
 1 - create VMs via Terraform
@@ -53,3 +54,12 @@ observability/alerts
 8 - CI/CD
 
 [cicd/README.md](cicd/README.md)
+
+-----------------------------------------------------------------------------------
+
+AI-pulished Documents and Production-Style Repo version :
+
+**[prod-style-documented](./prod-style-documented)**
+
+
+
