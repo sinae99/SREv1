@@ -12,7 +12,7 @@ Workflow: [`.github/workflows/geoapi.yml`](../.github/workflows/geoapi.yml)
 |------|------|
 | test | `pytest` in `api/` |
 | build-push | `ghcr.io/sinae99/geoapi:<sha>` + `:latest` |
-| deploy | apply `api/k8s/` → set image to `<sha>` |
+| deploy | apply `api/k8s/` |
 
 
 ## Secrets
