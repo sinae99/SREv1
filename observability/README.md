@@ -75,6 +75,7 @@ Stop:
 |------|---------|
 | `values.yaml` | Helm values |
 | `dashboards/nodes-overview.json` | Grafana: nodes status / CPU / RAM / pods |
+| `dashboards/geoapi-overview.json` | Grafana: GeoAPI health / traffic / cache / runtime |
 | `credentials.sh` | Print Grafana admin user/password |
 | `start-port-forwards.sh` | Port-forward Prometheus / Grafana / Alertmanager |
 | `stop-port-forwards.sh` | Stop those port-forwards |
