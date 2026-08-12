@@ -59,5 +59,5 @@ AI-pulished Documents and Production-Style Repo version :
 
 
 
-> **Note:** Some secrets, envs, and infra values are intentionally committed for **challenge** + keeping the project self-contained.
+> **Note:** Some secrets, envs, and infra values are intentionally committed for this **challenge** .
 
