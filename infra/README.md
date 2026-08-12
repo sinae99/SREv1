@@ -60,8 +60,6 @@ terraform output nodes
 
 ## 8. install Docker 
 
-as a habit
-
 via :
 
 https://github.com/sinae99/Docker-install-playbook
