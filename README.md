@@ -1,6 +1,6 @@
 ## Arvan Cloud SRE Challenge
 
-### phases
+### core phases 
 
 1 - create VMs via Terraform
 
