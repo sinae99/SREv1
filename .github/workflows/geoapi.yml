@@ -4,16 +4,23 @@ on:
   push:
     branches: [main]
     paths:
-      - "api/**"
+      - "api/app.py"
+      - "api/test_app.py"
+      - "api/requirements.txt"
+      - "api/Dockerfile"
       - ".github/workflows/geoapi.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
-  packages: write
+
+concurrency:
+  group: geoapi-main
+  cancel-in-progress: false
 
 env:
   IMAGE: ghcr.io/sinae99/geoapi
+  DEPLOYMENT_FILE: api/k8s/deployment.yaml
 
 jobs:
   test:
@@ -37,6 +44,9 @@ jobs:
   build-push:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -56,31 +66,49 @@ jobs:
             ${{ env.IMAGE }}:${{ github.sha }}
             ${{ env.IMAGE }}:latest
 
-  deploy:
+  update-manifest:
     needs: build-push
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-
-      - uses: azure/setup-kubectl@v4
         with:
-          version: "v1.30.0"
+          ref: main
+          fetch-depth: 0
 
-      - name: Setup kubeconfig
-        env:
-          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
+      - name: Update desired image in Git
         run: |
-          mkdir -p ~/.kube
-          printf '%s\n' "$KUBECONFIG_CONTENT" > ~/.kube/config
-          chmod 600 ~/.kube/config
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
 
-      - name: Apply manifests
+          path = Path(os.environ["DEPLOYMENT_FILE"])
+          image_prefix = f'image: {os.environ["IMAGE"]}:'
+          new_image = f'{image_prefix}{os.environ["GITHUB_SHA"]}'
+          lines = path.read_text().splitlines()
+
+          for index, line in enumerate(lines):
+              if line.strip().startswith(image_prefix):
+                  indent = line[:len(line) - len(line.lstrip())]
+                  lines[index] = f'{indent}{new_image}'
+                  break
+          else:
+              raise SystemExit(f'GeoAPI image was not found in {path}')
+
+          path.write_text('\n'.join(lines) + '\n')
+          PY
+
+      - name: Commit desired image
         run: |
-          kubectl apply -f api/k8s/namespace.yaml
-          kubectl apply -f api/k8s/secret.yaml
-          kubectl apply -f api/k8s/secret-ghcr.yaml
-          kubectl apply -f api/k8s/deployment.yaml
-          kubectl apply -f api/k8s/service.yaml
-          kubectl apply -f api/k8s/servicemonitor.yaml
-          kubectl -n geoapi set image deploy/geoapi geoapi=${{ env.IMAGE }}:${{ github.sha }}
-          kubectl -n geoapi rollout status deploy/geoapi --timeout=120s
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEPLOYMENT_FILE"
+
+          if git diff --cached --quiet; then
+            echo "Desired image is already ${IMAGE}:${GITHUB_SHA}"
+            exit 0
+          fi
+
+          git commit -m "deploy: geoapi ${GITHUB_SHA} [skip ci]"
+          git push origin HEAD:main
