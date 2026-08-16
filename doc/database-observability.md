@@ -1,10 +1,8 @@
-# Database and Observability Deep Dive
-
-This section covers the stateful backend and the monitoring stack.
+# Database + Observability
 
 ## Database Architecture
 
-The application cache is backed by CloudNativePG, not a hand-rolled database container.
+The application cache is backed by CloudNativePG.
 
 - one PostgreSQL cluster named `sina-db`
 - two instances for primary/standby behavior
@@ -12,16 +10,16 @@ The application cache is backed by CloudNativePG, not a hand-rolled database con
 - a dedicated database and user (`geoapi`)
 - local-path storage for simple persistent volumes
 
-## `doc/source/database/cluster.yaml`
+## `cluster.yaml`
 
-### Lines 1-5: object identity
+### object identity
 
 - `apiVersion: postgresql.cnpg.io/v1` selects the CloudNativePG CRD.
 - `kind: Cluster` tells Kubernetes that this is a CNPG cluster resource.
 - `metadata.name: sina-db` gives the database cluster its stable name.
 - `metadata.namespace: postgres` isolates the database from other workloads.
 
-### Lines 6-14: instance count and bootstrap
+### instance count and bootstrap
 
 - `instances: 2` creates a primary plus one replica.
 - `bootstrap.initdb.database: geoapi` creates the application database.
@@ -29,26 +27,22 @@ The application cache is backed by CloudNativePG, not a hand-rolled database con
 - `storage.size: 5Gi` keeps the state footprint small.
 - `storageClass: local-path` uses the cluster’s local-path provisioner.
 
-### Lines 15-21: resource tuning
+### resource
 
 - Requests and limits keep the Postgres pods small and schedulable.
 - The values are intentionally modest because the workload is just a cache.
 
-### Lines 22-25: PostgreSQL tuning
+### PostgreSQL tuning
 
 - `shared_buffers: "64MB"` sets a conservative memory buffer.
 - `max_connections: "50"` limits concurrency to a manageable number.
 
-### Lines 26-28: anti-affinity
+### anti-affinity
 
 - `enablePodAntiAffinity: true` encourages the primary and replica to land on different nodes.
 - `topologyKey: kubernetes.io/hostname` uses the node hostname as the spreading boundary.
 
-### Interview summary
-
-This file shows that the database is treated as a first-class stateful workload, not a sidecar or a throwaway container.
-
-## `doc/source/database/credentials.sh`
+## `credentials.sh`
 
 ### Input and output
 
@@ -63,22 +57,17 @@ This file shows that the database is treated as a first-class stateful workload,
 - If `dbname` is missing, the script falls back to `geoapi`.
 - The script prints the read/write service hostname `sina-db-rw.postgres.svc.cluster.local`.
 
-## `doc/source/database/README.md`
-
-- This is the operational database runbook.
-- It explains how to install the operator, create the namespace, apply the cluster manifest, and verify the pods and services.
-- It also shows the connection target that the API should use.
 
 ## Observability Architecture
 
-The monitoring stack is intentionally focused:
+The monitoring stack:
 
 - Prometheus for metrics collection
 - Grafana for dashboards
 - Alertmanager for alert routing
 - node-exporter for node-level telemetry
 
-## `doc/source/observability/values.yaml`
+## `values.yaml`
 
 ### Enabled components
 
@@ -89,17 +78,10 @@ The monitoring stack is intentionally focused:
 
 ### Prometheus tuning
 
-- `retention: 2d` keeps the time-series footprint small.
-- `scrapeInterval: 60s` and `evaluationInterval: 60s` set a simple cadence.
+- `retention: 2d` keeps the time-series footprint
 - `serviceMonitorSelectorNilUsesHelmValues: false` and `podMonitorSelectorNilUsesHelmValues: false` allow custom monitors to be discovered cleanly.
 
-### Disabled components
-
-- Cluster-control-plane and DNS-related exports are disabled.
-- `kube-state-metrics` is disabled here because the challenge keeps the stack minimal.
-- `defaultRules.create: false` avoids a large bundle of default alert rules.
-
-## `doc/source/observability/start-port-forwards.sh`
+## `start-port-forwards.sh`
 
 ### Input and output
 
@@ -114,39 +96,20 @@ The monitoring stack is intentionally focused:
 - The three `kubectl port-forward` commands run in the background and write PIDs to `/tmp`.
 - The script prints the URLs and points the user at `credentials.sh` and `stop-port-forwards.sh`.
 
-## `doc/source/observability/stop-port-forwards.sh`
+## `stop-port-forwards.sh`
 
 - Stops the background port-forwards by reading their PID files from `/tmp`.
 - Removes the pidfiles after killing the processes.
 
-## `doc/source/observability/credentials.sh`
+## `credentials.sh`
 
 - Finds the Grafana secret by label rather than by exact name.
 - Decodes the admin username and password from the secret data.
 - Prints the local Grafana URL and credentials for quick access.
 
-## `doc/source/observability/README.md`
 
-- This README is the install-and-use guide for the monitoring stack.
-- It covers namespace creation, Helm repo setup, Helm install, verification, and port-forward access.
-- The file list at the end explains where the dashboards and helper scripts live.
-
-## `doc/source/observability/dashboards/`
+## `observability/dashboards/`
 
 - `nodes-overview.json` is the infrastructure dashboard.
 - `geoapi-overview.json` is the service dashboard.
 - The screenshots under `screenshots/` provide visual proof of the dashboards in Grafana.
-
-## `doc/source/cicd/README.md`
-
-- Summarizes the delivery chain: push, test, build, push to GHCR, deploy to Kubernetes.
-- It is a documentation-only overview in this repo snapshot.
-
-## Key Database and Observability Message for Interviewers
-
-The platform is not just deployed — it is observable and stateful:
-
-- the API writes to a real Postgres cluster
-- Prometheus can scrape the application and the cluster
-- Grafana shows the health of both the platform and the service
-- helper scripts make access reproducible
