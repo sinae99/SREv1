@@ -1,0 +1,15 @@
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/*.tfstate
+**/*.tfstate.*
+**/crash.log
+**/override.tf
+**/*_override.tf
+**/.providers/
+
+# Python
+**/__pycache__/
+**/.pytest_cache/
+**/.venv/
+**/venv/

@@ -1,0 +1,41 @@
+# Generated Kubespray inventory snapshot.
+#
+# This file is the human-readable bridge between Terraform outputs and the
+# cluster installer. It tells Kubespray which node is control plane, which node
+# is etcd, and which nodes are workers.
+
+all:
+  hosts:
+    vm1:
+      # Public IP used for SSH and API-server reachability.
+      ansible_host: 37.32.15.242
+      # Private IP used for node-to-node traffic inside the cluster network.
+      ip: 192.168.1.109
+      # SSH login user taken from Terraform.
+      ansible_user: ubuntu
+    vm2:
+      ansible_host: 37.32.15.158
+      ip: 192.168.1.128
+      ansible_user: ubuntu
+    vm3:
+      ansible_host: 37.32.12.103
+      ip: 192.168.1.219
+      ansible_user: ubuntu
+  children:
+    kube_control_plane:
+      hosts:
+        # vm1 runs the Kubernetes control plane.
+        vm1: {}
+    etcd:
+      hosts:
+        # vm1 also runs etcd for this compact three-node setup.
+        vm1: {}
+    kube_node:
+      hosts:
+        # Both workers join the kube_node group.
+        vm2: {}
+        vm3: {}
+    k8s_cluster:
+      children:
+        kube_control_plane: {}
+        kube_node: {}

@@ -1,0 +1,6 @@
+# Dedicated namespace for the GeoAPI workload.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: geoapi

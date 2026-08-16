@@ -1,0 +1,17 @@
+# Internal service that exposes the Deployment inside the cluster.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: geoapi
+  namespace: geoapi
+  labels:
+    app: geoapi
+spec:
+  selector:
+    app: geoapi
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+  type: ClusterIP

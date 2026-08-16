@@ -1,0 +1,8 @@
+# Kubespray download behavior tuning.
+#
+# These flags reduce unnecessary centralization and let each node handle its own
+# image/download path when needed.
+
+download_run_once: false
+download_localhost: false
+download_force_cache: false

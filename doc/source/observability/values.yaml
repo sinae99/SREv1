@@ -1,0 +1,53 @@
+# Minimal kube-prometheus-stack values tailored to the challenge.
+
+# Keep the three visible observability components.
+alertmanager:
+  enabled: true
+
+grafana:
+  enabled: true
+
+prometheus:
+  enabled: true
+  prometheusSpec:
+    # Short retention is enough for the challenge timeline.
+    retention: 2d
+    scrapeInterval: 60s
+    evaluationInterval: 60s
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+# Expose node metrics so the cluster can be observed at the node level.
+prometheus-node-exporter:
+  enabled: true
+
+# Disable the rest to keep the stack focused and easy to explain.
+kube-state-metrics:
+  enabled: false
+
+kubeApiServer:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeEtcd:
+  enabled: false
+
+kubeProxy:
+  enabled: false
+
+kubelet:
+  enabled: false
+
+coreDns:
+  enabled: false
+
+kubeDns:
+  enabled: false
+
+defaultRules:
+  create: false

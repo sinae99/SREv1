@@ -1,0 +1,7 @@
+# Defaults; override via config.yml (-e "@config.yml").
+# Skip pulling images if the user already supplied tarballs.
+push_load_skip_pull: true
+# Where the controller stages tarballs before copying them to nodes.
+push_load_tarball_dir: "/tmp/docker-push-load"
+# Default SSH user for remote imports.
+push_load_remote_user: "ubuntu"

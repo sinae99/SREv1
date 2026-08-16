@@ -1,0 +1,35 @@
+# CloudNativePG cluster definition for the GeoAPI cache backend.
+
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: sina-db
+  namespace: postgres
+spec:
+  # Two instances means one primary and one standby.
+  instances: 2
+  bootstrap:
+    initdb:
+      # Create the application database and its owner at bootstrap time.
+      database: geoapi
+      owner: geoapi
+  storage:
+    # Small persistent volumes are enough because this is a cache database.
+    size: 5Gi
+    storageClass: local-path
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  postgresql:
+    parameters:
+      # Conservative tuning for a lightweight challenge workload.
+      shared_buffers: "64MB"
+      max_connections: "50"
+  affinity:
+    # Prefer primary and replica on different nodes.
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
