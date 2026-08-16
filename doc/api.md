@@ -1,10 +1,9 @@
-# API Deep Dive
+# API
 
-This section explains the Flask service, its tests, and its Kubernetes packaging.
+Flask service, its tests, and its Kubernetes packaging.
 
-## Architecture Role
+## Arch
 
-The API is the user-facing part of the system:
 
 - accepts an IP address as input
 - checks the PostgreSQL cache first
@@ -12,9 +11,9 @@ The API is the user-facing part of the system:
 - stores the result back into PostgreSQL
 - exposes Prometheus metrics for traffic and cache size
 
-## `doc/source/api/app.py`
+## `app.py`
 
-### Imports and globals
+### Imports / globals
 
 - `json`, `os`, `urllib.error`, and `urllib.request` support HTTP and configuration handling.
 - `psycopg` is the PostgreSQL client.
@@ -25,7 +24,7 @@ The API is the user-facing part of the system:
 - `app = Flask(__name__)` creates the WSGI app.
 - `_ready = False` is a one-time schema guard.
 
-### Database helpers
+### DB helpers
 
 - `get_conn()` reads `DATABASE_URL` from the environment and opens a Postgres connection.
 - `ensure_schema()` creates `ip_cache` only once and then flips `_ready` to avoid repeating the DDL on every request.
@@ -53,18 +52,7 @@ The API is the user-facing part of the system:
   - if not cached, call the external geo API, store the result, refresh the gauge, and return the lookup
   - convert database, network, timeout, and parsing failures into HTTP 502
 
-### Why the function layout is good
-
-The code separates concerns cleanly:
-
-- schema management
-- cache lookup and write
-- external API integration
-- HTTP response handling
-
-That makes the interview story easy: the service is simple, but each responsibility is explicit.
-
-## `doc/source/api/test_app.py`
+## `test_app.py`
 
 ### What the tests prove
 
@@ -81,7 +69,7 @@ That makes the interview story easy: the service is simple, but each responsibil
 - `MagicMock()` simulates the HTTP response object returned by `urlopen`.
 - The tests are fast because they do not require a real database or external HTTP service.
 
-## `doc/source/api/Dockerfile`
+## `Dockerfile`
 
 - `FROM python:3.12-slim` gives a small base image.
 - `WORKDIR /app` sets the container working directory.
@@ -90,7 +78,7 @@ That makes the interview story easy: the service is simple, but each responsibil
 - `EXPOSE 8000` documents the runtime port.
 - `CMD ["gunicorn", ...]` starts the Flask app with a production WSGI server.
 
-## `doc/source/api/requirements.txt`
+## `requirements.txt`
 
 - `flask` powers the HTTP API.
 - `gunicorn` serves the app in production.
@@ -98,21 +86,20 @@ That makes the interview story easy: the service is simple, but each responsibil
 - `prometheus-client` exports metrics.
 - `pytest` supports the unit test suite.
 
-## `doc/source/api/k8s/namespace.yaml`
+## `namespace.yaml`
 
 - Creates the `geoapi` namespace so the application has its own Kubernetes boundary.
 
-## `doc/source/api/k8s/secret.yaml`
+## `secret.yaml`
 
-- Stores `DATABASE_URL` as a Kubernetes secret.
-- The deployment reads this value via `secretKeyRef` so the image itself stays generic.
+- Stores `DATABASE_URL` as a Kubernetes secret
 
-## `doc/source/api/k8s/secret-ghcr.yaml`
+## `secret-ghcr.yaml`
 
 - Defines a `kubernetes.io/dockerconfigjson` image pull secret.
 - This is used so the cluster can pull the application image from GHCR.
 
-## `doc/source/api/k8s/deployment.yaml`
+## `deployment.yaml`
 
 ### Main runtime settings
 
@@ -136,37 +123,17 @@ That makes the interview story easy: the service is simple, but each responsibil
 
 - Requests and limits keep the pod lightweight and predictable.
 
-## `doc/source/api/k8s/service.yaml`
+## `service.yaml`
 
 - Exposes the deployment inside the cluster as a `ClusterIP` service.
 - Port `80` maps to the named container port `http`.
 
-## `doc/source/api/k8s/servicemonitor.yaml`
+## `servicemonitor.yaml`
 
 - Lets Prometheus scrape `/metrics` from the service.
 - `namespaceSelector` and `selector` ensure the monitor targets the `geoapi` service in the right namespace.
 
-## `doc/source/api/README.md`
-
-- Summarizes the stack, endpoints, layout, and unit-test command.
-- The README is the quick entry point, while `app.py` is the implementation detail.
-
-## `doc/source/api/metrics/README.md`
-
-- Documents the `/metrics` endpoint and the metrics that matter in this service.
-- It ties the code in `app.py` to the scrape configuration in `servicemonitor.yaml`.
-
-## `doc/source/api/test-api.md`
+## `test-api.md`
 
 - This is the manual verification playbook.
 - It shows how to port-forward the service, call `/health`, inspect metrics, query IPs, and validate the database cache directly.
-
-## Key API Message for Interviewers
-
-The service demonstrates a very clean pattern:
-
-- cache first
-- external lookup second
-- persist results
-- emit metrics
-- deploy with Kubernetes-native config and health checks
