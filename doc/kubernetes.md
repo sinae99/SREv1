@@ -1,8 +1,6 @@
-# Kubernetes Deep Dive
+# Kubernetes
 
-This section explains how the VMs become a Kubernetes cluster.
-
-## Architecture Role
+## Arch
 
 The Kubernetes layer turns the three Arvan VMs into:
 
@@ -16,7 +14,7 @@ It also creates the local artifacts that later scripts need:
 - a usable `kubeconfig`
 - evidence snapshots under `kubernetes/output/`
 
-## `doc/source/kubernetes/generate-inventory.sh`
+## `generate-inventory.sh`
 
 ### Input and output
 
@@ -36,11 +34,11 @@ It also creates the local artifacts that later scripts need:
 - `k8s_cluster_yml` sets `kube_network_plugin: calico` and adds TLS SANs for the API server.
 - `write_text()` creates the files in the Kubespray inventory tree.
 
-### Why this matters
+### Why
 
 This script is the bridge between Terraform and Ansible: it converts infrastructure state into cluster inventory without manual editing.
 
-## `doc/source/kubernetes/kubespray.sh`
+## `kubespray.sh`
 
 ### Input and output
 
@@ -60,11 +58,11 @@ This script is the bridge between Terraform and Ansible: it converts infrastruct
 - With no arguments, it defaults to `ansible-playbook -i inventory/mycluster/hosts.yaml cluster.yml --become`.
 - `docker run ...` launches the Kubespray image with the assembled mounts and arguments.
 
-### Why this design works
+### Why
 
 Running Kubespray in a container keeps the host clean and makes the installation reproducible.
 
-## `doc/source/kubernetes/fetch-kubeconfig.sh`
+## `fetch-kubeconfig.sh`
 
 ### Input and output
 
@@ -81,46 +79,30 @@ Running Kubespray in a container keeps the host clean and makes the installation
 - The embedded Python block rewrites the API server URL from loopback or private IP to the public control-plane IP.
 - The final file is saved as `kubeconfig` with mode `600`.
 
-### Why the rewrite matters
+### Why
 
-The kubeconfig inside the node usually points to a local or private endpoint; rewriting it makes the file usable from your laptop.
+The kubeconfig inside the node usually points to a local or private endpoint; rewriting it makes the file usable for me.
 
-## `doc/source/kubernetes/inventory/mycluster/hosts.yaml`
+## `inventory/mycluster/hosts.yaml`
 
 - This file is the generated Kubespray inventory snapshot.
 - `ansible_host` stores the public address used for SSH.
 - `ip` stores the private address used for node-to-node traffic.
 - The `children` groups map nodes to control-plane, etcd, and worker roles.
 
-## `doc/source/kubernetes/inventory/mycluster/group_vars/all/all.yml`
+## `inventory/mycluster/group_vars/all/all.yml`
 
 - `download_run_once: false` and the related flags tell Kubespray not to centralize downloads on just one host.
 - This reduces surprising behavior in environments where each node may need its own download handling.
 
-## `doc/source/kubernetes/inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
+## `inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml`
 
 - `kube_network_plugin: calico` selects the CNI.
 - `supplementary_addresses_in_ssl_keys` adds both the public and private control-plane addresses to the API server certificate SANs.
 - This prevents TLS errors when different scripts reach the API server through different addresses.
 
-## `doc/source/kubernetes/output/nodes` and `doc/source/kubernetes/output/pods`
+## `output/nodes` and `output/pods`
 
 - These are human-readable snapshots of `kubectl get nodes` and `kubectl get pods`.
 - They are evidence artifacts, not inputs to automation.
 - They help you show the interviewers the observed cluster state after installation.
-
-## `doc/source/kubernetes/README.md`
-
-- This README documents the operational sequence: generate inventory, install cluster, then fetch kubeconfig.
-- It also identifies the node roles and the chosen stack: Kubespray, Calico, and containerd.
-
-## Key Kubernetes Message for Interviewers
-
-The cluster bootstrap is clean because the scripts are chained:
-
-- Terraform produces node state
-- `generate-inventory.sh` turns that state into inventory
-- `kubespray.sh` installs the cluster
-- `fetch-kubeconfig.sh` makes the cluster accessible locally
-
-That is the entire control plane for the challenge in one flow.
